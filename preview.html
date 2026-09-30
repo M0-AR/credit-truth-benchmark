@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Credit-Truth-Benchmark — Verify 200-in-30 & 609-Loophole Claims Reproducibly</title>
+<meta name="description" content="MIT research repo: 14 credit-repair claims tested against FCRA §§609/611/623, myFICO weights, Experian/FICO 2025-26 aggregates. Docker one-command reproduction. Educational only."/>
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--accent:#22c55e;--accent2:#38bdf8;--warn:#f59e0b;--bad:#ef4444;--txt:#e5e7eb;--mut:#9ca3af;--line:#1f2b45}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--txt);background:linear-gradient(180deg,#0b1220,#0b1220 40%,#0d1528)}
+a{color:var(--accent2)}.wrap{max-width:1080px;margin:0 auto;padding:24px}
+.hero{background:radial-gradient(800px 300px at 20% 0%,#12325b,transparent),radial-gradient(700px 260px at 90% 10%,#0e3b2e,transparent),var(--bg);border:1px solid var(--line);border-radius:20px;padding:36px 32px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.badges img{height:22px}
+h1{font-size:34px;margin:8px 0 6px}.tag{color:var(--mut);font-size:17px;max-width:760px}
+.abstract{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:20px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h2{margin:0 0 10px;font-size:18px}.kpi{font-size:30px;font-weight:800}.mut{color:var(--mut);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:600}.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.ok{background:#052e1b;color:#4ade80}.no{background:#3b0a0a;color:#f87171}.mid{background:#3a2a05;color:#fbbf24}.na{background:#1f2937;color:#9ca3af}
+img.chart{width:100%;border-radius:10px;border:1px solid var(--line);background:#fff}
+video{width:100%;border-radius:12px;border:1px solid var(--line);background:#000}
+pre{background:#070d1a;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:13px}
+.toc a{display:inline-block;margin:4px 8px 4px 0;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:13px}
+footer{color:var(--mut);font-size:13px;margin:26px 0}
+.warn{background:#2a1c05;border:1px solid #7c4a03;border-radius:12px;padding:14px 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<div class="badges">
+<img alt="MIT" src="https://img.shields.io/badge/License-MIT-green.svg"/>
+<img alt="Docker" src="https://img.shields.io/badge/Docker-ready-blue.svg"/>
+<img alt="Python" src="https://img.shields.io/badge/Python-3.12-blue.svg"/>
+<img alt="Tests" src="https://img.shields.io/badge/tests-6_passed-brightgreen.svg"/>
+<img alt="Claims" src="https://img.shields.io/badge/claims-14_tested-orange.svg"/>
+<img alt="Verified" src="https://img.shields.io/badge/verified-2026--09--30-lightgrey.svg"/>
+</div>
+<h1>Credit-Truth-Benchmark</h1>
+<div class="tag">The “+200 FICO in 30 days via 609 loophole” promise, tested against real law, real scoring guidance &amp; public data — reproducibly, in one Docker command.</div>
+<div class="abstract"><b>CEO summary (30 seconds):</b> Popular books promise +200 points in &lt;30 days with “609 letters” and no agency. We turned 14 such claims into falsifiable tests, grounded law in the FTC FCRA text (Mar 2026) and bureau guidance (Experian 2025-03-11), grounded scoring in myFICO weights (35/30/15/10/10) and Experian/FICO 2025–26 aggregates (avg 713–714, util 29%), and ran 6 synthetic cohorts + a transparent educational simulator (seed 42). <b>Headline: REFUTED as a general method</b> — letters alone score +0 on an accurate file; 200-in-30 needs a rare tail (major error deletion + large cash paydown together). 5 sub-claims confirm (utilization, payment history, retention), 5 refute, 2 partially confirm conditionally. No personal bureau data. Educational only — not legal/financial advice.</div>
+<div class="toc">
+<a href="#demo">▶ Demo</a><a href="#verdict">Verdict table</a><a href="#charts">Charts</a><a href="#hidden">7 hidden patterns</a><a href="#run">Run it</a><a href="#live">Live check</a><a href="#paper">PhD path</a><a href="#sources">Sources</a>
+</div>
+</div>
+
+<h2 id="demo">▶ Demo (60 seconds)</h2>
+<div class="grid">
+<div class="card"><h2>Animated: 79% → 5% utilization paydown</h2>
+<img src="docs/demo.gif" alt="Demo animation: utilization 79 to 5 percent, score climbs" style="width:100%;border-radius:12px;border:1px solid var(--line)"/>
+<p class="mut">GIF autoplays on GitHub. Same story as MP4 below. Generated from <code>src/credit_truth/fico_simulator.py</code> — not hand-drawn.</p>
+</div>
+<div class="card"><h2>Video with controls (MP4)</h2>
+<video controls preload="metadata" src="docs/demo.mp4"></video>
+<p class="mut">GitHub README markdown can’t autoplay video with sound — best practice (2026): GIF above the fold + MP4/YouTube link. Open <code>docs/demo.mp4</code> directly or embed via release URL.</p>
+</div>
+</div>
+
+<h2 id="verdict">Verdict: 14 claims (paraphrased, not copied)</h2>
+<div class="card"><table>
+<tr><th>ID</th><th>Claim</th><th>Verdict</th><th>General effect</th></tr>
+<tr><td>C01</td><td>+200 in &lt;30d via 609 letters alone</td><td><span class="pill no">REFUTED general</span></td><td>+0; tail +140 (2 errors) / +270 (errors+paydown)</td></tr>
+<tr><td>C02</td><td>§609 forces deletion in 30d</td><td><span class="pill no">MISATTRIBUTION</span></td><td>That’s §611/§623; §609 = disclosure</td></tr>
+<tr><td>C03</td><td>Closing cards helps</td><td><span class="pill no">REFUTED</span></td><td>−25 (limit loss → util ↑)</td></tr>
+<tr><td>C04</td><td>Lower limits help</td><td><span class="pill no">REFUTED</span></td><td>−15</td></tr>
+<tr><td>C05</td><td>Must carry balance / pay interest</td><td><span class="pill no">REFUTED</span></td><td>pay-in-full wins by ~+50</td></tr>
+<tr><td>C06</td><td>“Closed by consumer” matters</td><td><span class="pill no">REFUTED</span></td><td>0 — scoring ignores notation</td></tr>
+<tr><td>C07</td><td>Checking own report hurts</td><td><span class="pill no">REFUTED</span></td><td>0 — soft inquiry</td></tr>
+<tr><td>C08</td><td>Util &lt;30%, &lt;10% optimal; statement-date matters</td><td><span class="pill ok">CONFIRMED</span></td><td>+80 (65%→8%)</td></tr>
+<tr><td>C09</td><td>Payment history 35%; one 30d late −60…−110</td><td><span class="pill ok">CONFIRMED</span></td><td>−80 clean file</td></tr>
+<tr><td>C10</td><td>Hard inquiries −3…−5, 25-mo visible</td><td><span class="pill mid">CONFIRMED nuanced</span></td><td>−5 each; ~12-mo weight</td></tr>
+<tr><td>C11</td><td>Goodwill / pay-for-delete</td><td><span class="pill mid">PARTIAL conditional</span></td><td>+70 <i>if</i> granted in writing</td></tr>
+<tr><td>C12</td><td>Authorized-user piggybacking</td><td><span class="pill mid">CONFIRMED attenuated</span></td><td>+90 thin file; FICO 8 dampens</td></tr>
+<tr><td>C13</td><td>Retention 7y / Ch.7 10y / inquiries 2y</td><td><span class="pill ok">CONFIRMED</span></td><td>FCRA §605</td></tr>
+<tr><td>C14</td><td>Monitoring prevents theft</td><td><span class="pill no">REFUTED as prevention</span></td><td>detection only</td></tr>
+</table>
+<p class="mut">Full logic: <code>src/credit_truth/claims.py</code>. Numbers are simulator-directional, not guarantees; FICO is proprietary.</p></div>
+
+<h2 id="charts">Charts (reproduced on your machine)</h2>
+<div class="grid">
+<div class="card"><h2>Utilization cliffs</h2><img class="chart" src="benchmarks/util_cliffs.png" alt="Utilization cliffs chart"/><p class="mut">1–9% optimal; 0% slightly suboptimal (no activity); 79%→5% ≈ +130 in simulator.</p></div>
+<div class="card"><h2>Late-payment decay</h2><img class="chart" src="benchmarks/late_decay.png" alt="Late payment decay chart"/><p class="mut">Same 30d late: −80 at 1 mo, −56 at 13 mo, −36 at 30 mo. Clean files hit harder.</p></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>All 14 claims at a glance</h2><img class="chart" src="benchmarks/claims_waterfall.png" alt="Claims waterfall chart"/></div>
+
+<h2 id="hidden">7 hidden patterns (your PhD seeds)</h2>
+<div class="grid">
+<div class="card"><h2>1. Statement-date ≠ due-date</h2>Paying by due date still reports high util if statement already closed. Pay <i>before statement close</i>; AZEO (all-zero-except-one 1–5%) ≈ +20…+50 vs 30% baseline.</div>
+<div class="card"><h2>2. Per-card vs aggregate</h2>One 95% card hurts (−20) even if aggregate is 20%. Distribute balances; keep every card &lt;30%.</div>
+<div class="card"><h2>3. Late asymmetry + decay</h2>Same late costs more on clean files. Impact ×1.0 (&lt;12 mo), ×0.7 (12–24 mo), ×0.45 (≥24 mo).</div>
+<div class="card"><h2>4. Scorecard non-linearity</h2>FICO segments into ~12 scorecards (bankruptcy/delinquency/thin/age). Thin-file penalty −20 in simulator.</div>
+<div class="card"><h2>5. 609→611 pipeline</h2>609 disclosure <i>enables</i> a 611 dispute but scores +0 by itself. Books conflate them.</div>
+<div class="card"><h2>6. Knowledge-gap moderator</h2>67% think income affects score (FICO/Harris 2026). FICO-knowledge RCT (Homonoff et al., NBER w26048, 400k borrowers) cut past-dues — behavior, not mechanics.</div>
+</div>
+<div class="card" style="margin-top:16px"><h2>7. Utilization cliffs at 10/30/50/70/90%</h2>Matches Experian Sep-2025 table: poor 79% → fair 61% → good 39% → very-good 15% → exceptional 7%. National avg 29%.</div>
+
+<h2 id="run">Run it (Docker = 1 command)</h2>
+<div class="card"><pre>cd credit-truth-benchmark
+docker compose build benchmark
+docker compose run --rm benchmark python -m credit_truth.evaluate --out /app/benchmarks/results.json
+docker compose run --rm benchmark pytest -q   # 6 passed
+# Jupyter: docker compose up jupyter  # http://localhost:8888 token credit-truth
+# Local: pip install -r requirements.txt && PYTHONPATH=src pytest -q
+# Notebooks: jupyter nbconvert --to notebook --execute notebooks/01_verify_law_and_weights.ipynb --output 01.executed.ipynb --allow-errors</pre>
+<p class="mut">Seed 42 everywhere. <code>benchmarks/results.json</code> holds all cohort deltas + claim verdicts.</p></div>
+
+<h2 id="live">Live / real-market check (no personal data in repo)</h2>
+<div class="card"><ol>
+<li>Pull <b>your own</b> 3 reports at <a href="https://www.annualcreditreport.com">AnnualCreditReport.com</a> (free weekly in 2026). Compute balances ÷ limits.</li>
+<li>Paste aggregate + max per-card util into <code>notebooks/02_hidden_patterns.ipynb</code> cell 5 — nothing leaves your machine.</li>
+<li>Public aggregates are hard-coded with source + date in <code>src/credit_truth/data_loaders.py</code> and re-fetchable via notebook 01.</li>
+<li>Economics: 720→760 on $400k/30y ≈ $50k lifetime (practitioner calc — recompute from FRED + CFPB tables before journal use).</li>
+</ol></div>
+
+<div class="warn"><b>Educational only. Not legal advice. Not financial advice. Not a credit-repair service.</b> No instructions for false disputes, re-aging, fraud-alert abuse, or paid-tradeline sales. For help: nonprofit counselor via <a href="https://www.nfcc.org">NFCC</a>. Simulator is directional, NOT FICO/VantageScore.</div>
+
+<h2 id="paper">PhD path</h2>
+<div class="card"><p><code>paper/paper_draft.md</code>: Abstract → Intro → Legal ground truth (§609 vs §611) → Scoring ground truth → Method → Results → Hidden patterns → Threats → Related work (Hoadley QP; Brown youth debt; Agarwal age-of-reason; Homonoff FICO-knowledge RCT) → Conclusion → References. Next: CFPB complaint-panel longitudinal study, statement-date nudge RCT, AU attenuation across FICO versions.</p></div>
+
+<h2 id="sources">Sources (retrieved 2026-09-30)</h2>
+<div class="card"><ul>
+<li>FTC FCRA Mar-2026 PDF (§609 p.47, §611 p.59) · Fed §609 page · CFPB Reg V App O 2026 ($16 cap) · FTC furnisher duties 623(b)/660.4</li>
+<li>myFICO weights 35/30/15/10/10 (live-fetched) · Experian “609 request isn’t a dispute” 2025-03-11 (live-fetched)</li>
+<li>Experian avg 713 + util table 79/61/39/15/7 · FICO Insights Spring-26 avg 714, 48.1% ≥750</li>
+<li>OpenAlex/Crossref: Hoadley 2020; Brown et al.; Agarwal et al.; Homonoff et al. NBER w26048 · Kaggle synthetic CC0/CC-BY-SA</li>
+<li>README craft: Standard-README spec; awesome-readme (+35% star lift w/ hero image); 2026 audit (800–1500 words, GIF above fold, 4 badges); GitHub video workarounds (MP4 via issue URL / YouTube thumbnail / GIF); shields.io docs</li>
+</ul>
+<p class="mut">Every factual claim → URL + date in <code>docs/SOURCES.md</code>. See <code>docs/ETHICS.md</code>, <code>docs/LIMITATIONS.md</code>.</p></div>
+
+<footer>MIT for code + figures · paper CC-BY-4.0 · public data © publishers · Verified 2026-09-30 · <a href="README.md">README.md</a> · <a href="benchmarks/results.json">results.json</a></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+{
+  "seed": 42,
+  "simulator": "educational, not FICO",
+  "public_aggregates": {
+    "avg_fico_2025_experian": {
+      "value": 713,
+      "source": "https://www.experian.com/blogs/ask-experian/what-is-the-average-credit-score-in-the-u-s/",
+      "retrieved": "2026-09-30",
+      "note": "Sep 2025 data, published Mar 30 2026, first decline since 2013"
+    },
+    "avg_fico_spring26_fico": {
+      "value": 714,
+      "source": "https://investors.fico.com/news-releases/news-release-details/ficor-score-credit-insights-report-average-fico-score-dips-714",
+      "retrieved": "2026-09-30"
+    },
+    "avg_util_2025": {
+      "value": 0.29,
+      "source": "Experian 2025 table",
+      "retrieved": "2026-09-30"
+    },
+    "util_by_band": {
+      "poor_300_579": 0.79,
+      "fair_580_669": 0.61,
+      "good_670_739": 0.39,
+      "verygood_740_799": 0.15,
+      "exceptional_800_850": 0.07,
+      "source": "Experian Sep 2025"
+    },
+    "fico_weights": {
+      "payment": 0.35,
+      "amounts_owed": 0.3,
+      "length": 0.15,
+      "new_credit": 0.1,
+      "mix": 0.1,
+      "source": "https://www.myfico.com/credit-education/whats-in-your-credit-score",
+      "retrieved": "2026-09-30"
+    },
+    "kaggle_synthetic": [
+      "chaitanyajamble/realistic-credit-scoring-and-loan-default-prediction (CC0, FICO-like)",
+      "hamziai/3million-enterprise-bank-records-ultimate-fraud (CC BY-SA 4.0, synthetic)"
+    ],
+    "law": {
+      "sec609_disclosure": "15 USC 1681g \u2014 https://www.federalreserve.gov/frrs/regulations/section-609-disclosures-to-consumers.htm",
+      "sec611_dispute": "15 USC 1681i \u2014 30d (+15d), 5 business days to furnisher",
+      "ftc_fcra_mar2026": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "experian_609_blog": "https://www.experian.com/blogs/ask-experian/what-is-a-609-dispute-letter/ (2025-03-11)"
+    }
+  },
+  "cohorts": [
+    {
+      "cohort": "high_util_paydown_65_to_8",
+      "before": 760,
+      "after": 840,
+      "delta": 80,
+      "explain_before": {
+        "payment": 0,
+        "utilization": -80,
+        "length_thin": -10,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 760
+      },
+      "explain_after": {
+        "payment": 0,
+        "utilization": 0,
+        "length_thin": -10,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 840
+      }
+    },
+    {
+      "cohort": "error_file_2collections_removed",
+      "before": 695,
+      "after": 835,
+      "delta": 140,
+      "explain_before": {
+        "payment": -140,
+        "utilization": -15,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 695
+      },
+      "explain_after": {
+        "payment": 0,
+        "utilization": -15,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 835
+      }
+    },
+    {
+      "cohort": "combined_tail_30day_max_plausible",
+      "before": 560,
+      "after": 830,
+      "delta": 270,
+      "explain_before": {
+        "payment": -140,
+        "utilization": -130,
+        "length_thin": -10,
+        "new_credit": -10,
+        "mix": 0,
+        "total": 560
+      },
+      "explain_after": {
+        "payment": 0,
+        "utilization": 0,
+        "length_thin": -10,
+        "new_credit": -10,
+        "mix": 0,
+        "total": 830
+      }
+    },
+    {
+      "cohort": "thin_file_authorized_user",
+      "before": 725,
+      "after": 815,
+      "delta": 90,
+      "explain_before": {
+        "payment": 0,
+        "utilization": -40,
+        "length_thin": -70,
+        "new_credit": 0,
+        "mix": -15,
+        "total": 725
+      },
+      "explain_after": {
+        "payment": 0,
+        "utilization": 0,
+        "length_thin": -20,
+        "new_credit": 0,
+        "mix": -15,
+        "total": 815
+      }
+    },
+    {
+      "cohort": "single_30d_late_on_clean_780",
+      "before": 850,
+      "after": 770,
+      "delta": -80,
+      "explain_before": {
+        "payment": 0,
+        "utilization": 0,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 850
+      },
+      "explain_after": {
+        "payment": -80,
+        "utilization": 0,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 770
+      }
+    },
+    {
+      "cohort": "azero_AZEO_vs_30pct",
+      "before": 810,
+      "after": 850,
+      "delta": 40,
+      "explain_before": {
+        "payment": 0,
+        "utilization": -40,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 810
+      },
+      "explain_after": {
+        "payment": 0,
+        "utilization": 0,
+        "length_thin": 0,
+        "new_credit": 0,
+        "mix": 0,
+        "total": 850
+      }
+    }
+  ],
+  "claims": [
+    {
+      "id": "C01",
+      "verdict": "REFUTED as general (tail-only)",
+      "detail": "Letters alone, accurate file, no behavior change: +0. Tail (2 inaccurate collections removed): +140. 200-in-30 requires combined error+utilization swing, not letters alone.",
+      "general_gain": 0,
+      "tail_gain": 140
+    },
+    {
+      "id": "C02",
+      "verdict": "MISATTRIBUTION",
+      "detail": "Deletion-on-failure-to-verify in 30d is Sec 611(a)/623(b), not Sec 609. Sec 609 grants disclosure. Citing 609 as deletion authority misstates law (FTC FCRA Mar 2026; Experian 2025).",
+      "general_gain": 0,
+      "tail_gain": 0
+    },
+    {
+      "id": "C03",
+      "verdict": "REFUTED",
+      "detail": "Closing unused card raises utilization, score delta -25 (negative). Keep open unless fee/harm.",
+      "general_gain": -25,
+      "tail_gain": -25
+    },
+    {
+      "id": "C04",
+      "verdict": "REFUTED",
+      "detail": "Lowering limit mechanically raises utilization (balance/limit). Paying down balance is the correct lever.",
+      "general_gain": -15,
+      "tail_gain": -15
+    },
+    {
+      "id": "C05",
+      "verdict": "REFUTED",
+      "detail": "Pay-in-full low-util beats carrying balance by ~+50. No interest needed; 1-5% reported optimal.",
+      "general_gain": 50,
+      "tail_gain": 50
+    },
+    {
+      "id": "C06",
+      "verdict": "REFUTED",
+      "detail": "FICO scoring ignores who-closed notation. Account age still counts while on report; limit loss is what matters.",
+      "general_gain": 0,
+      "tail_gain": 0
+    },
+    {
+      "id": "C07",
+      "verdict": "REFUTED",
+      "detail": "Self-check = soft inquiry, zero scoring impact. Hard inquiry only on credit application.",
+      "general_gain": 0,
+      "tail_gain": 0
+    },
+    {
+      "id": "C08",
+      "verdict": "CONFIRMED",
+      "detail": "65% util vs 5%: delta 80 pts. <30% acceptable, <10% optimal, statement-close timing controls reported value.",
+      "general_gain": 80,
+      "tail_gain": 80
+    },
+    {
+      "id": "C09",
+      "verdict": "CONFIRMED",
+      "detail": "One 30d late on clean file: -80 pts (range -60..-110 verified). 35% weight.",
+      "general_gain": -80,
+      "tail_gain": -80
+    },
+    {
+      "id": "C10",
+      "verdict": "CONFIRMED with nuance",
+      "detail": "4 inquiries: -20 total (~-5.0 each). Visible 25mo, scoring impact ~12mo; rate-shopping window bunches mortgage/auto.",
+      "general_gain": -20,
+      "tail_gain": -20
+    },
+    {
+      "id": "C11",
+      "verdict": "PARTIALLY_CONFIRMED conditional",
+      "detail": "Collection deletion (if granted, in writing): +70. Not guaranteed; paid-collection still hurts on FICO 8; FICO 9/10T/Vantage ignore paid. Get agreement in writing first.",
+      "general_gain": 70,
+      "tail_gain": 70
+    },
+    {
+      "id": "C12",
+      "verdict": "CONFIRMED with attenuation",
+      "detail": "Thin->piggybacked strong file: +90 in simulator. FICO 8 dampens AU vs own tradelines; still helps thin files. Never pay strangers for tradelines.",
+      "general_gain": 90,
+      "tail_gain": 90
+    },
+    {
+      "id": "C13",
+      "verdict": "CONFIRMED",
+      "detail": "Most negatives 7y; Ch.7 bankruptcy 10y; hard inquiries 2y visibility. Matches FCRA 605.",
+      "general_gain": 0,
+      "tail_gain": 0
+    },
+    {
+      "id": "C14",
+      "verdict": "REFUTED as prevention",
+      "detail": "Monitoring = detection/alerting (daily/weekly, lagged by furnisher reporting). Prevention requires freeze, locked mailbox, shredding, secure auth. False security risk if monitoring-only.",
+      "general_gain": 0,
+      "tail_gain": 0
+    }
+  ],
+  "headline": "C01 REFUTED as general: letters alone +0; tail combined error+utilization can approach large gains but 200-in-30 not reproducible as method."
+}
